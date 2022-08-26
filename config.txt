@@ -1,0 +1,29 @@
+{
+# 公众号配置
+# 公众号appId
+"app_id": "wxf79941489e081188",
+# 公众号appSecret
+"app_secret": "a7672829bf7d4e972a85a8c5ec809eed",
+# 模板消息id
+"template_id": "IqrUgiK4uY4LXRj6_A5cKEv43bXkrsnyh6qcmgGfQqY",
+# 接收公众号消息的微信号，如果有多个，需要在[]里用英文逗号间隔，例如["wx1", "wx2"]
+"user": ["oXTzm6JQ7KyzGr4Jlo7dloGZ1QL8"],
+
+# 信息配置
+# 和风天气apikey
+"weather_key": "d59c8e3fd1834febbef6d7b55d353694",
+# 天行数据apikey
+"tian_api": "4b282bc3c1029361855aba3939161daa",
+# 所在地区，可为省，城市，区，县，同时支持国外城市，例如伦敦(国外城市可能获取不到pm2.5，空气质量，今日建议等数据)
+"region": "郑州",
+# 生日1
+"birthday1": {"name": "王划璞的生日", "birthday": "r1998-10-13"},
+# 生日2
+"birthday2": {"name": "考研", "birthday": "2022-12-24"},
+# 在一起的日子，格式同上
+"love_date": "2017-08-31",
+# 金句中文，如果为空，默认会读取金山的每日金句
+"note_ch": "",
+# 金句英文
+"note_en": ""
+}
