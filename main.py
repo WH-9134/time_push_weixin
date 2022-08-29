@@ -89,6 +89,49 @@ def get_weather(region):
     return weather, temp, max_temp, min_temp, wind_dir, sunrise, sunset, category, pm2p5, proposal
 
 
+def get_English():
+    try:
+        key = config["tian_api"]
+        url = "http://api.tianapi.com/everyday/index?key={}".format(key)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
+            'Content-type': 'application/x-www-form-urlencoded'
+
+        }
+        response = get(url, headers=headers).json()
+        if response["code"] == 200:
+            english = response["newslist"][0]["content"]
+            Cn = response["newslist"][0]["note"]
+        else:
+            english = ""
+    except KeyError:
+        english = ""
+    return english , Cn
+
+
+def get_Xiaohua():
+    try:
+        key = config["tian_api"]
+        nums = 1
+        url = "http://api.tianapi.com/joke/index?key={}&num=1".format(key)
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36',
+            'Content-type': 'application/x-www-form-urlencoded'
+
+        }
+
+        response = get(url, headers=headers).json()
+        if response["code"] == 200:
+            title = response["newslist"][0]["title"]
+            xh = response["newslist"][0]["content"]
+        else:
+            title = ""
+    except KeyError:
+        title = ""
+    return title, xh
+
 def get_tianhang():
     try:
         key = config["tian_api"]
@@ -158,9 +201,44 @@ def get_ciba():
     note_ch = r.json()["note"]
     return note_ch, note_en
 
+def send_Xiaohua(to_user,access_token,title , Xiaohua):
+    url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
+    data = {
+    "touser": to_user,
+    "template_id": config["template_id2"],
+    "url": "http://weixin.qq.com/download",
+    "topcolor": "#FF0000",
+    "data": {
+        "title": {
+                "value": title,
+                "color": get_color()
+            },
+        "Xiaohua": {
+            "value": Xiaohua,
+            "color": get_color()
+        },
+    }
+}
+    headers = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                      'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+    }
+    response = post(url, headers=headers, json=data).json()
+    if response["errcode"] == 40037:
+        print("推送消息失败，请检查模板id是否正确")
+    elif response["errcode"] == 40036:
+        print("推送消息失败，请检查模板id是否为空")
+    elif response["errcode"] == 40003:
+        print("推送消息失败，请检查微信号是否正确")
+    elif response["errcode"] == 0:
+        print("推送消息成功")
+    else:
+        print(response)
+
 
 def send_message(to_user, access_token, region_name, weather, temp, wind_dir, note_ch, note_en, max_temp, min_temp,
-                 sunrise, sunset, category, pm2p5, proposal, chp):
+                 sunrise, sunset, category, pm2p5, proposal, chp, english, Cn):
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     year = localtime().tm_year
@@ -250,6 +328,14 @@ def send_message(to_user, access_token, region_name, weather, temp, wind_dir, no
                 "value": chp,
                 "color": get_color()
             },
+            "english": {
+                "value": english,
+                "color": get_color()
+            },
+            "Cn": {
+                "value": Cn,
+                "color": get_color()
+            },
 
         }
     }
@@ -306,8 +392,11 @@ if __name__ == "__main__":
         # 获取词霸每日金句
         note_ch, note_en = get_ciba()
     chp = get_tianhang()
+    english , Ch = get_English()
+    title , Xiaohua = get_Xiaohua()
     # 公众号推送消息
     for user in users:
         send_message(user, accessToken, region, weather, temp, wind_dir, note_ch, note_en, max_temp, min_temp, sunrise,
-                     sunset, category, pm2p5, proposal, chp)
+                     sunset, category, pm2p5, proposal, chp, english, Ch)
+        send_Xiaohua(user, accessToken,title , Xiaohua)
     os.system("pause")
